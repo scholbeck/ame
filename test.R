@@ -27,7 +27,7 @@ checkEqualToMargins(mar1, ame1)
 
 at2 = list(group = c("1", "2"))
 mar2 = margins(mod, data = data, at = at2)
-ame2 = computeAME(mod, data = data, features = c("treatment", "age", "group"), at = at2,
+ame2 = computeAME(mod, data = data, features = c("age", "treatment", "group"), at = at2,
   predict.fun = function(object, newdata) predict(object, newdata = newdata, type = "response"))
 #lapply(unlist(ame2, recursive = FALSE), unlist)
 ame2

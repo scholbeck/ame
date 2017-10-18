@@ -62,6 +62,9 @@ computeAME = function(model, data, features, at = NULL, predict.fun = NULL, cl =
 #   })))
 # }
 
+#' Recreates summary.margins method
+#'
+#' @export
 summary.AME = function(x, ...) {
   id.vars = colnames(x)[grepl("^at\\(.*\\)$", colnames(x))]
   ret = melt(x, id.vars = id.vars, variable.name = "factor", value.name = "AME")
