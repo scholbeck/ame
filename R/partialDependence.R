@@ -12,7 +12,7 @@
 #' @export
 #'
 #' @examples
-partialDependenceData = function(model, data, target, feature, derivative = FALSE, uniform = FALSE, gridsize = 10L, plot = FALSE) {
+partialDependenceData = function(model, data, target, feature, derivative = FALSE, uniform = FALSE, gridsize = 10L, plot = FALSE, predict.fun = NULL) {
   # Var 1:
   if (uniform) {
     pd.x.min = min(data[[feature]])
@@ -25,11 +25,11 @@ partialDependenceData = function(model, data, target, feature, derivative = FALS
   # TODO: für die gleichen x-Werte nicht mehrmals Derivative berechnen
   if (derivative) {
     pd.y = unlist(lapply(pd.x, function(i) derivative(x = i, feature = feature, data = data, model = model,
-      predict.fun = function(object, newdata) kernlab::predict(object, newdata))))
+      predict.fun = predict.fun)))
     # BUG: allgemeine predict function benutzen !!!!!!!
   } else {
     pd.y = unlist(lapply(pd.x, function(i) predictModifiedData(x = i, feature = feature, data = data, model = model,
-      predict = function(model, newdata) kernlab::predict(model, newdata))))
+      predict = predict.fun)))
     # BUG: allgemeine predict function benutzen !!!!!!!
   }
 
