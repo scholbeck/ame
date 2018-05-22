@@ -7,33 +7,32 @@ data$outcome = as.factor(data$outcome)
 data$group = as.factor(data$group)
 data$treatment = as.factor(data$treatment)
 
-form = outcome ~ treatment*group + age + I(age^2) + treatment:age
+form = outcome ~ treatment*group + age + I(age^2) + treatment:age + ycn
 mod = glm(form, data = data, family = binomial)
 mar = margins(mod, data = data)
 summary(mar)
 
 # bootrstap function
-bootstrapSE = function(model.fun = function(formula, data) glm(formula, data = data, family = "binomial"),
-  data, bs.iters = 30, features, at = NULL, predict.fun = NULL, cl = NULL, ...) {
-
-  rdesc = mlr::makeResampleDesc("Bootstrap", iters = bs.iters)
-  rin = mlr::makeResampleInstance(rdesc, size = nrow(data))
-  ame = lapply(rin$train.inds, function(i) {
-    model = model.fun(formula, data = data[i,])
-    computeAME(model, data[i,], features = features, at = at,
-      predict.fun = predict.fun, cl = cl, ...)
-    })
-}
+# bootstrapSE = function(model.fun = function(formula, data) glm(formula, data = data, family = "binomial"),
+#   data, bs.iters = 30, features, at = NULL, predict.fun = NULL, cl = NULL, ...) {
+#
+#   rdesc = mlr::makeResampleDesc("Bootstrap", iters = bs.iters)
+#   rin = mlr::makeResampleInstance(rdesc, size = nrow(data))
+#   ame = lapply(rin$train.inds, function(i) {
+#     model = model.fun(formula, data = data[i, ])
+#     computeAME(model, data[i, ], features = features, at = at,
+#       predict.fun = predict.fun, cl = cl, ...)
+#     })
+# }
 
 # fit models on 100 bootstrapped data
-bs1 = bootstrapSE(
+bs1 = bootstrapReplicates(
   model.fun = function(formula, data) glm(formula = form, data = data, family = binomial),
   data = data,
   bs.iters = 100,
-  features = c("age"),
+  features = c("age", "treatment", "ycn"),
   predict.fun = function(object, newdata) predict(object, newdata = newdata, type = "response"))
+bs1
 
-# sd of the AMEs is the standard error
-sd(unlist(bs1))
-
-
+bootstrapEstimate(bs1)
+bootstrapCI(bs1, 0.05)
